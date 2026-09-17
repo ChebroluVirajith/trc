@@ -1,0 +1,40 @@
+
+    
+        header{
+            background-image:url();
+            background-size: cover;
+            
+        }
+
+        h1{
+            text-align: center;
+            color: black;
+        }
+        
+        .btn1,.btn2,.btn3,.btn4{
+            
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            
+            
+            
+        }
+.btn{
+    
+    margin-bottom: 40px;
+    border: 1px solid #80a6e3;
+    padding:10px;
+    background-color: blue;
+    width: 20%;
+    border-radius: 15px;
+    text-align: center;
+
+}
+   
+ .container{
+    margin-top: 100px;
+    margin-left: 43%;
+    
+}
+   

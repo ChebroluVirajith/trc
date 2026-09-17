@@ -1,0 +1,100 @@
+/* Blueprint Animation and Vector System Styles - Divine Gold & Platinum */
+
+.blueprint-container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 50%, #0c1424 0%, #070c17 70%, #04070e 100%);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.blueprint-grid-major {
+  stroke: rgba(212, 175, 55, 0.15);
+  stroke-width: 1;
+}
+
+.blueprint-grid-minor {
+  stroke: rgba(212, 175, 55, 0.05);
+  stroke-width: 0.5;
+}
+
+.blueprint-stroke-primary {
+  stroke: #d4af37;
+  stroke-width: 1.5;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 5px rgba(212, 175, 55, 0.5));
+}
+
+.blueprint-stroke-gold {
+  stroke: #fce49c;
+  stroke-width: 1.5;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 6px rgba(252, 228, 156, 0.6));
+}
+
+.blueprint-stroke-platinum {
+  stroke: #ffffff;
+  stroke-width: 1.5;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.5));
+}
+
+.blueprint-stroke-dashed {
+  stroke: rgba(212, 175, 55, 0.4);
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+  fill: none;
+}
+
+.blueprint-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  fill: #fce49c;
+  letter-spacing: 0.1em;
+  opacity: 0.9;
+}
+
+.blueprint-gear-rotate {
+  transform-origin: center;
+  animation: gearSpin 20s linear infinite;
+}
+
+.blueprint-gear-rotate-reverse {
+  transform-origin: center;
+  animation: gearSpinReverse 15s linear infinite;
+}
+
+@keyframes gearSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes gearSpinReverse {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+.blueprint-piston {
+  animation: pistonStroke 3s ease-in-out infinite alternate;
+}
+
+@keyframes pistonStroke {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-25px); }
+}
+
+.pulse-circuit {
+  stroke-dasharray: 12 120;
+  animation: circuitFlow 4s linear infinite;
+}
+
+@keyframes circuitFlow {
+  from { stroke-dashoffset: 200; }
+  to { stroke-dashoffset: 0; }
+}
