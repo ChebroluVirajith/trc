@@ -38,7 +38,7 @@ export const TeamSection: React.FC = () => {
 
         {/* Committees Grid matching roboveda.org */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-          {TEAMS_DATA.map((team) => (
+          {TEAMS_DATA.map((team: TeamCategory) => (
             <div
               key={team.id}
               onClick={() => handleOpenTeam(team)}

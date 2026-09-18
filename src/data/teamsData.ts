@@ -1,76 +1,292 @@
-import { TicketTier } from '../types';
+import { TeamCategory } from '../types';
 
-export const TICKETS_DATA: TicketTier[] = [
+export const TEAMS_DATA: TeamCategory[] = [
   {
-    id: 'master-pass',
-    title: 'Master Access Pass',
-    badge: 'ALL-INCLUSIVE',
-    price: '₹1499',
-    description: 'Ultimate festival pass granting multi-event entry, arena matches, flagship keynote sessions, and networking dinner.',
-    features: [
-      'Entry to all Combat & Arena Events',
-      'Access to Pradarshan (Project Expo)',
-      'Ideathon Registration included',
-      'Official RoboVeda Kit & Merchandise',
-      'Certificate of Master Participation'
-    ],
-    link: 'https://forms.gle/bnNtH7c5x2SM3MjGA',
-    isPopular: true
+    id: 'advisors',
+    title: 'Advisory Board',
+    image: '/img/Nontech RG25/advisor.png',
+    lead: 'Faculty Mentors & Institutional Guides',
+    members: [
+      {
+        name: 'Dr. K. S. Rao',
+        role: 'Director - SNIST & Chief Patron',
+        image: '/img/Nontech RG25/advisor.png',
+        phone: '+916301932007',
+        email: 'director@sreenidhi.edu.in'
+      },
+      {
+        name: 'Dr. T. Ch. Siva Reddy',
+        role: 'Principal & Faculty Advisor - TRC',
+        image: '/img/Nontech RG25/advisor.png',
+        phone: '+916301932007',
+        email: 'principal@sreenidhi.edu.in'
+      },
+      {
+        name: 'Prof. K. Suman',
+        role: 'Convenor - The Robotics Club SNIST',
+        image: '/img/Nontech RG25/advisor.png',
+        phone: '+916301932007',
+        email: 'convenor.trc@sreenidhi.edu.in'
+      }
+    ]
   },
   {
-    id: 'single-event-pass',
-    title: 'Single Event Entry',
-    badge: 'STANDARD',
-    price: '₹399',
-    description: 'Registration pass for a single competition category (Ranaveera, Pushpak, Gati, etc.) for team pilots.',
-    features: [
-      'Entry to 1 Selected Competitive Event',
-      'Arena Testing Slot & Technical Scrutiny',
-      'Participation Certificate',
-      'Access to Spectator Viewing Decks'
-    ],
-    link: 'https://forms.gle/bnNtH7c5x2SM3MjGA'
+    id: 'steering',
+    title: 'Steering Committee',
+    image: '/img/Nontech RG25/Steering.jpg',
+    lead: 'Festival Operations & Strategic Planning',
+    members: [
+      {
+        name: 'Steering Directorate Head',
+        role: 'Chief Operations Strategist',
+        image: '/img/Nontech RG25/Steering.jpg',
+        phone: '+916301932007',
+        email: 'roboveda.steering@sreenidhi.edu.in'
+      },
+      {
+        name: 'Festival Secretary',
+        role: 'Inter-Institutional Liaison',
+        image: '/img/Nontech RG25/Steering.jpg',
+        phone: '+916301932007',
+        email: 'secretary.trc@sreenidhi.edu.in'
+      }
+    ]
   },
   {
-    id: 'workshop-pass',
-    title: 'Workshop Masterclass Pass',
-    badge: 'CERTIFIED',
-    price: '₹799',
-    description: 'Hands-on intensive masterclass in Drone Dynamics or Robotics & IoT with hardware kit takeaway.',
-    features: [
-      'Full Day Hands-on Lab Masterclass',
-      'Complete Takeaway Hardware/Component Kit',
-      'Direct Mentorship from Industry UAV/IoT Leads',
-      'Industry-Recognized ISO Certified Credential'
-    ],
-    link: 'https://forms.gle/bnNtH7c5x2SM3MjGA'
+    id: 'core',
+    title: 'Core Committee',
+    image: '/img/Nontech RG25/Core.png',
+    lead: 'Executive Leadership & Overall Execution',
+    members: [
+      {
+        name: 'President - TRC',
+        role: 'Executive Head of RoboVeda',
+        image: '/img/Nontech RG25/Core.png',
+        phone: '+916301932007',
+        email: 'president.trc@sreenidhi.edu.in'
+      },
+      {
+        name: 'Vice President (Technical)',
+        role: 'Technical Operations Head',
+        image: '/img/Nontech RG25/Core.png',
+        phone: '+916301932007',
+        email: 'vp.tech@sreenidhi.edu.in'
+      },
+      {
+        name: 'Vice President (Non-Technical)',
+        role: 'Management & Operations Head',
+        image: '/img/Nontech RG25/Core.png',
+        phone: '+916301932007',
+        email: 'vp.nontech@sreenidhi.edu.in'
+      }
+    ]
   },
   {
-    id: 'pradarshan-combo',
-    title: 'Pradarshan + Ideathon Combo',
-    badge: 'INNOVATION',
-    price: '₹599',
-    description: 'Dual pass for student innovators showcasing both their project hardware prototype and venture idea pitch.',
-    features: [
-      'Project Expo Stall with Power & Table Space',
-      'Ideathon Pitch Slot before Investor/Faculty Jury',
-      'Direct Incubation & Grant Evaluation',
-      'Innovation Delegate Certificates'
-    ],
-    link: 'https://forms.gle/bnNtH7c5x2SM3MjGA'
+    id: 'technical',
+    title: 'Technical Directorate',
+    image: '/img/Nontech RG25/Techincal.png',
+    lead: 'Arena Systems, Hardware & Embedded Labs',
+    members: [
+      {
+        name: 'Technical Directorate Lead',
+        role: 'Arena Architect & Hardware Engineer',
+        image: '/img/Nontech RG25/Techincal.png',
+        phone: '+916301932007',
+        email: 'technical@sreenidhi.edu.in'
+      },
+      {
+        name: 'Combat Systems Coordinator',
+        role: 'RoboWars & Combat Arena Marshall',
+        image: '/img/Nontech RG25/Techincal.png',
+        phone: '+916301932007',
+        email: 'combat.trc@sreenidhi.edu.in'
+      },
+      {
+        name: 'Autonomous Systems Lead',
+        role: 'Sensors & Embedded Robotics Mentor',
+        image: '/img/Nontech RG25/Techincal.png',
+        phone: '+916301932007',
+        email: 'autonomous.trc@sreenidhi.edu.in'
+      }
+    ]
+  },
+  {
+    id: 'design',
+    title: 'Design & Visual Identity',
+    image: '/img/Nontech RG25/DESIGNING.jpg',
+    lead: 'UI/UX, 3D Assets & Festival Branding',
+    members: [
+      {
+        name: 'Creative Director',
+        role: 'Visual Identity & Graphic Design',
+        image: '/img/Nontech RG25/DESIGNING.jpg',
+        phone: '+916301932007',
+        email: 'design.trc@sreenidhi.edu.in'
+      },
+      {
+        name: '3D Artist & Motion Designer',
+        role: 'RoboGuru & Cyber Visuals',
+        image: '/img/Nontech RG25/DESIGNING.jpg',
+        phone: '+916301932007',
+        email: 'creative.trc@sreenidhi.edu.in'
+      }
+    ]
+  },
+  {
+    id: 'marketing',
+    title: 'Marketing & Sponsorships',
+    image: '/img/Nontech RG25/Marketing.png',
+    lead: 'Corporate Relations & Industrial Alliances',
+    members: [
+      {
+        name: 'Head of Sponsorships',
+        role: 'Corporate Alliances & Outreach',
+        image: '/img/Nontech RG25/Marketing.png',
+        phone: '+916301932007',
+        email: 'sponsorships.trc@sreenidhi.edu.in'
+      },
+      {
+        name: 'Brand Partnerships Lead',
+        role: 'Industry Collaborations',
+        image: '/img/Nontech RG25/Marketing.png',
+        phone: '+916301932007',
+        email: 'marketing.trc@sreenidhi.edu.in'
+      }
+    ]
+  },
+  {
+    id: 'publicity',
+    title: 'Publicity & Media',
+    image: '/img/Nontech RG25/PUBLICITY1.jpg',
+    lead: 'Campus Outreach & Digital Campaigns',
+    members: [
+      {
+        name: 'Publicity Head',
+        role: 'National Campus Ambassador Network',
+        image: '/img/Nontech RG25/PUBLICITY1.jpg',
+        phone: '+916301932007',
+        email: 'publicity.trc@sreenidhi.edu.in'
+      },
+      {
+        name: 'Social Media & PR Lead',
+        role: 'Digital Broadcasts & Promotions',
+        image: '/img/Nontech RG25/PUBLICITY1.jpg',
+        phone: '+916301932007',
+        email: 'media.trc@sreenidhi.edu.in'
+      }
+    ]
+  },
+  {
+    id: 'documentation',
+    title: 'Documentation & Media',
+    image: '/img/Nontech RG25/Documentation.png',
+    lead: 'Official Records, Rulebooks & Accreditations',
+    members: [
+      {
+        name: 'Documentation Head',
+        role: 'ISO Compliance & Festival Archives',
+        image: '/img/Nontech RG25/Documentation.png',
+        phone: '+916301932007',
+        email: 'documentation.trc@sreenidhi.edu.in'
+      },
+      {
+        name: 'Editorial Lead',
+        role: 'Official Rulebooks & Press Relations',
+        image: '/img/Nontech RG25/Documentation.png',
+        phone: '+916301932007',
+        email: 'editorial.trc@sreenidhi.edu.in'
+      }
+    ]
+  },
+  {
+    id: 'organizing',
+    title: 'Organizing Committee',
+    image: '/img/Nontech RG25/Organising.png',
+    lead: 'Crowd Flow, Logistics & Event Security',
+    members: [
+      {
+        name: 'Organizing Chief',
+        role: 'On-Ground Crowd & Arena Control',
+        image: '/img/Nontech RG25/Organising.png',
+        phone: '+916301932007',
+        email: 'organizing.trc@sreenidhi.edu.in'
+      },
+      {
+        name: 'Arena Operations Lead',
+        role: 'Stage & Facilities Management',
+        image: '/img/Nontech RG25/Organising.png',
+        phone: '+916301932007',
+        email: 'logistics.trc@sreenidhi.edu.in'
+      }
+    ]
+  },
+  {
+    id: 'hospitality',
+    title: 'Hospitality & Logistics',
+    image: '/img/Nontech RG25/Hospitality.png',
+    lead: 'Outstation Delegate Care & Accommodation',
+    members: [
+      {
+        name: 'Hospitality Head',
+        role: 'Outstation Teams & Accommodations',
+        image: '/img/Nontech RG25/Hospitality.png',
+        phone: '+916301932007',
+        email: 'hospitality.trc@sreenidhi.edu.in'
+      },
+      {
+        name: 'Transport & Reception Lead',
+        role: 'Campus Guidance & Food Services',
+        image: '/img/Nontech RG25/Hospitality.png',
+        phone: '+916301932007',
+        email: 'reception.trc@sreenidhi.edu.in'
+      }
+    ]
+  },
+  {
+    id: 'inventory',
+    title: 'Inventory & Procurement',
+    image: '/img/Nontech RG25/Inventory.png',
+    lead: 'Component Distribution & Lab Equipment',
+    members: [
+      {
+        name: 'Inventory Lead',
+        role: 'Electronic Hardware & Component Dispatch',
+        image: '/img/Nontech RG25/Inventory.png',
+        phone: '+916301932007',
+        email: 'inventory.trc@sreenidhi.edu.in'
+      },
+      {
+        name: 'Procurement Coordinator',
+        role: 'Lab Equipment & Arena Materials',
+        image: '/img/Nontech RG25/Inventory.png',
+        phone: '+916301932007',
+        email: 'procurement.trc@sreenidhi.edu.in'
+      }
+    ]
+  },
+  {
+    id: 'workshop-org',
+    title: 'Workshops & Events Wing',
+    image: '/img/Nontech RG25/WORKSHOP.jpg',
+    lead: 'Masterclass Schedules & Hands-on Labs',
+    members: [
+      {
+        name: 'Workshops Directorate Head',
+        role: 'Hands-on Labs & Robotics Masterclasses',
+        image: '/img/Nontech RG25/WORKSHOP.jpg',
+        phone: '+916301932007',
+        email: 'workshops.trc@sreenidhi.edu.in'
+      },
+      {
+        name: 'Hackathon Coordinator',
+        role: '24-Hour Autonomous Bot Challenge',
+        image: '/img/Nontech RG25/WORKSHOP.jpg',
+        phone: '+916301932007',
+        email: 'hackathon.trc@sreenidhi.edu.in'
+      }
+    ]
   }
 ];
 
-export const HOSPITALITY_DATA = {
-  title: "Outstation Hospitality & Stay",
-  description: "Delegates and teams traveling to Hyderabad for RoboVeda'26 can reserve campus accommodation, food arrangements, and local transit support.",
-  formLink: "https://docs.google.com/forms/d/e/1FAIpQLSdftJdlL_9tZYBHYCpTuKjXscZXITjRajQLgn96ZR8nUZzqjA/viewform",
-  contact: "+91 63019 32007",
-  email: "roboveda@sreenidhi.edu.in"
-};
+export default TEAMS_DATA;
 
-export const CAMPUS_AMBASSADOR_DATA = {
-  title: "Campus Ambassador Program",
-  description: "Represent RoboVeda'26 at your university. Lead college delegations, earn exclusive merchandise, leadership credentials, and cash incentives.",
-  formLink: "https://forms.gle/bnNtH7c5x2SM3MjGA"
-};
