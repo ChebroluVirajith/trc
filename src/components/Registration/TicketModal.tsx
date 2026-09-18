@@ -6,9 +6,10 @@ import { TechnicalBadge } from '../Common/TechnicalBadge';
 interface TicketModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSelectTier?: (tierId: string) => void;
 }
 
-export const TicketModal: React.FC<TicketModalProps> = ({ isOpen, onClose }) => {
+export const TicketModal: React.FC<TicketModalProps> = ({ isOpen, onClose, onSelectTier }) => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -103,19 +104,24 @@ export const TicketModal: React.FC<TicketModalProps> = ({ isOpen, onClose }) => 
                   ))}
                 </div>
 
-                <a
-                  href={tier.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (onSelectTier) {
+                      onSelectTier(tier.id);
+                    } else {
+                      window.open(tier.link, '_blank');
+                    }
+                  }}
                   className={`w-full py-3 text-center font-mono font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all shadow-md ${
                     tier.isPopular
                       ? 'bg-gradient-to-r from-gold-light via-gold to-gold-amber hover:from-white hover:to-gold-light text-black shadow-gold/20'
                       : 'bg-surface-subtle hover:bg-slate-800 text-slate-200 border border-gold/30 hover:border-gold'
                   }`}
                 >
-                  <span>CONFIRM SEAT</span>
+                  <span>CONFIRM SEAT & PAY</span>
                   <ArrowUpRight className="w-3.5 h-3.5" />
-                </a>
+                </button>
               </div>
             ))}
           </div>
