@@ -1,6 +1,8 @@
 // Vercel Serverless Function: api/verify-payment.ts
-// Verifies status of a Cashfree PG order
+// Verifies Razorpay payment signature using HMAC-SHA256 algorithm
 declare const process: any;
+
+import crypto from 'crypto';
 
 export default async function handler(req: any, res: any) {
   // Set CORS headers
@@ -17,99 +19,79 @@ export default async function handler(req: any, res: any) {
     return;
   }
 
-  const orderId = req.query.order_id || req.body?.order_id;
-
-  if (!orderId) {
-    return res.status(400).json({ error: 'order_id query parameter is required.' });
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method Not Allowed. Use POST.' });
   }
-
-  const appId = process.env.CASHFREE_APP_ID || process.env.CASHFREE_CLIENT_ID;
-  const secretKey = process.env.CASHFREE_SECRET_KEY || process.env.CASHFREE_CLIENT_SECRET;
-  const env = (process.env.CASHFREE_ENV || 'SANDBOX').toUpperCase();
-  const apiVersion = process.env.CASHFREE_API_VERSION || '2023-08-01';
-
-  // If mock mode
-  if (!appId || !secretKey || orderId.startsWith('RV26_mock') || orderId.includes('mock')) {
-    return res.status(200).json({
-      order_id: orderId,
-      order_status: 'PAID',
-      order_amount: 1499,
-      order_currency: 'INR',
-      payment_status: 'SUCCESS',
-      is_mock: true,
-      transaction_id: `TXN_${Date.now().toString().slice(-8)}`,
-      payment_time: new Date().toISOString(),
-      message: 'Payment verified successfully (Mock Dev Mode)'
-    });
-  }
-
-  const baseUrl = env === 'PRODUCTION'
-    ? `https://api.cashfree.com/pg/orders/${orderId}`
-    : `https://sandbox.cashfree.com/pg/orders/${orderId}`;
 
   try {
-    const response = await fetch(baseUrl, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'x-api-version': apiVersion,
-        'x-client-id': appId,
-        'x-client-secret': secretKey
-      }
-    });
+    const {
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature,
+      order_id,
+      payment_id,
+      signature
+    } = req.body || {};
 
-    const data = await response.json();
+    const orderId = razorpay_order_id || order_id;
+    const paymentId = razorpay_payment_id || payment_id;
+    const receivedSignature = razorpay_signature || signature;
 
-    if (!response.ok) {
-      console.error('Cashfree Verify Order Error:', data);
-      return res.status(response.status).json({
-        error: data.message || 'Failed to fetch order from Cashfree',
-        details: data
+    if (!orderId || !paymentId || !receivedSignature) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required parameters: razorpay_order_id, razorpay_payment_id, and razorpay_signature are required.'
       });
     }
 
-    // Also attempt to get specific payment details if possible
-    let payments: any[] = [];
-    try {
-      const paymentsUrl = env === 'PRODUCTION'
-        ? `https://api.cashfree.com/pg/orders/${orderId}/payments`
-        : `https://sandbox.cashfree.com/pg/orders/${orderId}/payments`;
+    const keySecret = process.env.RAZORPAY_KEY_SECRET || 'agkEyZz9H4spVP9BNT3SGj7j';
 
-      const paymentsRes = await fetch(paymentsUrl, {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-          'x-api-version': apiVersion,
-          'x-client-id': appId,
-          'x-client-secret': secretKey
-        }
+    if (!keySecret) {
+      return res.status(500).json({
+        success: false,
+        error: 'Razorpay Key Secret is not configured in server environment.'
       });
-      if (paymentsRes.ok) {
-        payments = await paymentsRes.json();
-      }
-    } catch (payErr) {
-      console.warn('Could not fetch payment details array:', payErr);
     }
 
-    const latestSuccessfulPayment = Array.isArray(payments)
-      ? payments.find((p: any) => p.payment_status === 'SUCCESS') || payments[0]
-      : null;
+    // Razorpay Signature verification: HMAC-SHA256(order_id + "|" + payment_id, KEY_SECRET)
+    const payload = `${orderId}|${paymentId}`;
+    const expectedSignature = crypto
+      .createHmac('sha256', keySecret)
+      .update(payload)
+      .digest('hex');
 
+    const isSignatureValid = expectedSignature === receivedSignature;
+
+    if (!isSignatureValid) {
+      console.error('Razorpay Signature Mismatch!', {
+        receivedSignature,
+        expectedSignature,
+        orderId,
+        paymentId
+      });
+      return res.status(400).json({
+        success: false,
+        payment_status: 'FAILED',
+        error: 'Payment verification failed: Signature mismatch. Transaction was not authenticated.'
+      });
+    }
+
+    // Signature matches! Mark as success
     return res.status(200).json({
-      order_id: data.order_id,
-      order_status: data.order_status,
-      order_amount: data.order_amount,
-      order_currency: data.order_currency,
-      customer_details: data.customer_details,
-      payment_status: data.order_status === 'PAID' ? 'SUCCESS' : (latestSuccessfulPayment?.payment_status || 'PENDING'),
-      payment_method: latestSuccessfulPayment?.payment_group || latestSuccessfulPayment?.payment_method || 'ONLINE',
-      transaction_id: latestSuccessfulPayment?.cf_payment_id || data.order_id,
-      payment_time: latestSuccessfulPayment?.payment_completion_time || new Date().toISOString()
+      success: true,
+      order_id: orderId,
+      payment_id: paymentId,
+      transaction_id: paymentId,
+      order_status: 'PAID',
+      payment_status: 'SUCCESS',
+      payment_time: new Date().toISOString(),
+      message: 'Payment verified and authenticated successfully.'
     });
   } catch (error: any) {
-    console.error('Internal Server Error in verify-payment:', error);
+    console.error('Error verifying Razorpay payment:', error);
     return res.status(500).json({
-      error: 'Internal Server Error while verifying order',
+      success: false,
+      error: 'Internal Server Error while verifying signature',
       message: error?.message || 'Unknown error'
     });
   }

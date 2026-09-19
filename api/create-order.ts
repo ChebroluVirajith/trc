@@ -1,6 +1,7 @@
 // Vercel Serverless Function: api/create-order.ts
-// Handles creation of Cashfree PG orders and returns payment_session_id
+// Handles creation of Razorpay orders and returns order_id & amount in paise
 declare const process: any;
+declare const Buffer: any;
 
 export default async function handler(req: any, res: any) {
   // Set CORS headers
@@ -23,7 +24,7 @@ export default async function handler(req: any, res: any) {
 
   try {
     const {
-      amount,
+      amount, // Amount in INR (Rupees)
       customerName,
       customerEmail,
       customerPhone,
@@ -33,87 +34,60 @@ export default async function handler(req: any, res: any) {
       branch,
       year,
       teamName,
-      teamMembers,
-      returnUrl
+      teamMembers
     } = req.body || {};
 
-    if (!amount || Number(amount) <= 0) {
-      return res.status(400).json({ error: 'Invalid order amount.' });
-    }
-    if (!customerName || !customerEmail || !customerPhone) {
-      return res.status(400).json({ error: 'Customer name, email, and phone are required.' });
-    }
+    const keyId = process.env.RAZORPAY_KEY_ID || process.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_TdmeWie4roD4or';
+    const keySecret = process.env.RAZORPAY_KEY_SECRET || 'agkEyZz9H4spVP9BNT3SGj7j';
 
-    const appId = process.env.CASHFREE_APP_ID || process.env.CASHFREE_CLIENT_ID;
-    const secretKey = process.env.CASHFREE_SECRET_KEY || process.env.CASHFREE_CLIENT_SECRET;
-    const env = (process.env.CASHFREE_ENV || 'SANDBOX').toUpperCase();
-    const apiVersion = process.env.CASHFREE_API_VERSION || '2023-08-01';
-
-    // Generate unique order ID
-    const uniqueSuffix = Math.random().toString(36).substring(2, 7).toUpperCase();
-    const orderId = `RV26_${Date.now().toString().slice(-6)}_${uniqueSuffix}`;
-    const sanitizedPhone = customerPhone.replace(/\D/g, '').slice(-10);
-    const customerId = `CUST_${sanitizedPhone || Date.now()}`;
-
-    // If Cashfree keys are not configured yet, return a mock session for seamless dev preview
-    if (!appId || !secretKey) {
-      console.warn('Cashfree API credentials not configured in environment variables. Using development simulation mode.');
-      return res.status(200).json({
-        mock: true,
-        order_id: orderId,
-        order_amount: Number(amount),
-        order_currency: 'INR',
-        payment_session_id: `mock_session_${orderId}`,
-        customer_details: {
-          customer_id: customerId,
-          customer_name: customerName,
-          customer_email: customerEmail,
-          customer_phone: sanitizedPhone
-        },
-        order_meta: {
-          pass_title: passTitle || 'ROBOVEDA 26 Pass',
-          college: college || 'N/A'
-        },
-        message: 'Order created in preview simulation mode (Add CASHFREE_APP_ID & CASHFREE_SECRET_KEY in Vercel to activate live gateway).'
+    if (!keyId || !keySecret) {
+      return res.status(401).json({
+        error: 'Razorpay credentials not configured. Please set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET.'
       });
     }
 
-    const baseUrl = env === 'PRODUCTION'
-      ? 'https://api.cashfree.com/pg/orders'
-      : 'https://sandbox.cashfree.com/pg/orders';
+    // Convert amount in INR to Paise (1 INR = 100 Paise)
+    const amountInRupees = Number(amount);
+    const amountInPaise = Math.round(amountInRupees * 100);
+
+    // Minimum amount: 100 paise (₹1.00)
+    if (!amountInPaise || amountInPaise < 100) {
+      return res.status(400).json({ error: 'Invalid amount. Minimum amount is ₹1.00 (100 paise).' });
+    }
+
+    if (!customerName || !customerEmail || !customerPhone) {
+      return res.status(400).json({ error: 'Customer name, email, and phone number are required.' });
+    }
+
+    const uniqueSuffix = Math.random().toString(36).substring(2, 7).toUpperCase();
+    const receipt = `rcpt_${Date.now().toString().slice(-6)}_${uniqueSuffix}`;
 
     const orderPayload = {
-      order_id: orderId,
-      order_amount: Number(amount),
-      order_currency: 'INR',
-      customer_details: {
-        customer_id: customerId,
-        customer_name: customerName.trim(),
-        customer_email: customerEmail.trim(),
-        customer_phone: sanitizedPhone
-      },
-      order_meta: {
-        return_url: returnUrl || `https://trc-rv.vercel.app/?order_id=${orderId}`
-      },
-      order_note: `ROBOVEDA'26 - ${passTitle || 'Pass Registration'} | ${customerName} (${college || 'SNIST'})`,
-      order_tags: {
-        pass_id: (passId || 'general').substring(0, 40),
-        pass_title: (passTitle || 'Pass').substring(0, 40),
-        college: (college || 'SNIST').substring(0, 40),
-        branch: (branch || 'N/A').substring(0, 40),
-        year: (year || 'N/A').substring(0, 20),
-        team_name: (teamName || 'N/A').substring(0, 40)
+      amount: amountInPaise,
+      currency: 'INR',
+      receipt,
+      notes: {
+        pass_id: String(passId || 'general').substring(0, 40),
+        pass_title: String(passTitle || 'Pass').substring(0, 40),
+        customer_name: String(customerName).substring(0, 40),
+        customer_email: String(customerEmail).substring(0, 40),
+        customer_phone: String(customerPhone).substring(0, 15),
+        college: String(college || 'SNIST').substring(0, 40),
+        branch: String(branch || 'N/A').substring(0, 40),
+        year: String(year || 'N/A').substring(0, 20),
+        team_name: String(teamName || 'N/A').substring(0, 40),
+        team_members: String(teamMembers || 'N/A').substring(0, 80)
       }
     };
 
-    const response = await fetch(baseUrl, {
+    // Direct official Razorpay REST API call with Basic Auth
+    const authHeader = 'Basic ' + Buffer.from(`${keyId}:${keySecret}`).toString('base64');
+
+    const response = await fetch('https://api.razorpay.com/v1/orders', {
       method: 'POST',
       headers: {
-        'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'x-api-version': apiVersion,
-        'x-client-id': appId,
-        'x-client-secret': secretKey
+        'Authorization': authHeader
       },
       body: JSON.stringify(orderPayload)
     });
@@ -121,26 +95,26 @@ export default async function handler(req: any, res: any) {
     const data = await response.json();
 
     if (!response.ok) {
-      console.error('Cashfree Create Order Error:', data);
+      console.error('Razorpay Order API Error:', data);
       return res.status(response.status).json({
-        error: data.message || 'Failed to create order with Cashfree',
+        error: data.error?.description || data.message || 'Failed to create order with Razorpay',
         details: data
       });
     }
 
     return res.status(200).json({
-      order_id: data.order_id,
-      payment_session_id: data.payment_session_id,
-      order_status: data.order_status,
-      order_amount: data.order_amount,
-      order_currency: data.order_currency,
-      customer_details: data.customer_details
+      order_id: data.id,
+      amount: data.amount,
+      currency: data.currency,
+      key_id: keyId,
+      receipt: data.receipt,
+      notes: data.notes
     });
   } catch (error: any) {
-    console.error('Internal Server Error in create-order:', error);
+    console.error('Error creating Razorpay order:', error);
     return res.status(500).json({
-      error: 'Internal Server Error while creating order',
-      message: error?.message || 'Unknown error'
+      error: error?.error?.description || error?.message || 'Internal Server Error while creating order',
+      details: error
     });
   }
 }

@@ -7,7 +7,6 @@ import {
   AlertCircle,
   QrCode,
   Download,
-  Share2,
   Sparkles,
   ArrowRight,
   RefreshCw,
@@ -22,13 +21,11 @@ import { TechnicalBadge } from '../Common/TechnicalBadge';
 import { TICKETS_DATA } from '../../data/ticketsData';
 import { TicketTier } from '../../types';
 import {
-  createPaymentOrder,
-  verifyPaymentOrder,
-  triggerCashfreeCheckout,
-  getCashfreeMode,
+  createRazorpayOrder,
+  triggerRazorpayCheckout,
   CustomerDetails,
   PaymentVerificationResult
-} from '../../utils/cashfree';
+} from '../../utils/razorpay';
 
 interface RegistrationFormModalProps {
   isOpen: boolean;
@@ -126,43 +123,41 @@ export const RegistrationFormModal: React.FC<RegistrationFormModalProps> = ({
     setStep('processing');
 
     try {
-      // Step 1: Create Order via serverless endpoint or fallback
       const passTitle = eventName
         ? `${currentTier.title} - ${eventName}`
         : currentTier.title;
 
-      const orderData = await createPaymentOrder({
+      // Step 1: Create Razorpay order on backend
+      const order = await createRazorpayOrder({
         amount: amountNumeric,
         passId: currentTier.id,
         passTitle,
         customer: formData
       });
 
-      if (!orderData || (!orderData.payment_session_id && !orderData.order_id)) {
-        throw new Error(orderData?.error || 'Failed to initialize payment gateway.');
+      if (!order || !order.order_id) {
+        throw new Error('Failed to generate Razorpay payment order.');
       }
 
-      const orderId = orderData.order_id;
-      setActiveOrderId(orderId);
+      setActiveOrderId(order.order_id);
 
-      // Step 2: Open Cashfree Checkout Modal / Dropin
-      await triggerCashfreeCheckout(
-        orderData.payment_session_id,
-        async (completedOrderId) => {
-          setStep('verifying');
-          const targetId = completedOrderId || orderId;
-          const verification = await verifyPaymentOrder(targetId);
-          setPaymentResult(verification);
+      // Step 2: Open Razorpay Standard Checkout Modal
+      await triggerRazorpayCheckout({
+        order,
+        passTitle,
+        customer: formData,
+        onSuccess: (result) => {
+          setPaymentResult(result);
           setStep('success');
         },
-        (error) => {
-          console.error('Payment checkout failed/closed:', error);
+        onFailure: (error) => {
+          console.error('Razorpay checkout failed/closed:', error);
           setErrorMessage(
             error?.message || 'Payment was cancelled or could not be completed. Please try again.'
           );
           setStep('form');
         }
-      );
+      });
     } catch (err: any) {
       console.error('Error during registration checkout:', err);
       setErrorMessage(err?.message || 'An unexpected error occurred. Please try again.');
@@ -192,9 +187,9 @@ export const RegistrationFormModal: React.FC<RegistrationFormModalProps> = ({
         <div className="flex items-center justify-between p-5 border-b border-gold/30 bg-surface-subtle">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <TechnicalBadge code="CASHFREE_PG" label="SECURE GATEWAY" variant="gold" />
+              <TechnicalBadge code="RAZORPAY_GATEWAY" label="SECURE 256-BIT" variant="gold" />
               <span className="font-mono text-[11px] text-cyan-400 font-semibold flex items-center gap-1">
-                <Lock className="w-3 h-3 text-cyan-400" /> 256-BIT ENCRYPTED
+                <Lock className="w-3 h-3 text-cyan-400" /> INSTANT VERIFICATION
               </span>
             </div>
             <h2 className="text-xl sm:text-2xl font-display font-black text-white uppercase tracking-tight">
@@ -224,7 +219,7 @@ export const RegistrationFormModal: React.FC<RegistrationFormModalProps> = ({
                   REGISTRATION CONFIRMED!
                 </h3>
                 <p className="text-xs sm:text-sm text-slate-300 font-sans">
-                  Your payment has been successfully verified via Cashfree PG. Welcome to ROBOVEDA'26 ASCENSION!
+                  Your payment has been successfully verified via Razorpay. Welcome to ROBOVEDA'26 ASCENSION!
                 </p>
               </div>
 
@@ -286,7 +281,7 @@ export const RegistrationFormModal: React.FC<RegistrationFormModalProps> = ({
                   <div className="space-y-1">
                     <span className="text-slate-400 uppercase text-[10px]">ORDER & TXN REF:</span>
                     <div className="text-xs text-slate-300 font-mono">
-                      {activeOrderId} {paymentResult?.transaction_id ? `// ${paymentResult.transaction_id}` : ''}
+                      {activeOrderId} {paymentResult?.payment_id ? `// ${paymentResult.payment_id}` : ''}
                     </div>
                   </div>
                 </div>
@@ -336,11 +331,11 @@ export const RegistrationFormModal: React.FC<RegistrationFormModalProps> = ({
               <div className="space-y-1">
                 <h4 className="font-display font-bold text-xl text-white uppercase">
                   {step === 'processing'
-                    ? 'CONNECTING TO CASHFREE SECURE GATEWAY...'
-                    : 'VERIFYING TRANSACTION INTEGRITY...'}
+                    ? 'LAUNCHING RAZORPAY SECURE CHECKOUT...'
+                    : 'AUTHENTICATING PAYMENT SIGNATURE...'}
                 </h4>
                 <p className="text-xs font-mono text-slate-400">
-                  Please do not refresh or close this window while the secure session is loaded.
+                  Please do not refresh or close this window while your transaction is processed.
                 </p>
               </div>
             </div>
@@ -541,7 +536,7 @@ export const RegistrationFormModal: React.FC<RegistrationFormModalProps> = ({
                   className="px-8 py-4 bg-gradient-to-r from-gold-light via-gold to-gold-amber hover:from-white hover:to-gold-light text-black font-mono font-black text-sm uppercase tracking-wider flex items-center gap-2 transition-all shadow-[0_0_25px_rgba(212,175,55,0.35)] border border-gold group"
                 >
                   <CreditCard className="w-4 h-4" />
-                  <span>PAY ₹{amountNumeric} VIA CASHFREE</span>
+                  <span>PAY ₹{amountNumeric} VIA RAZORPAY</span>
                   <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                 </button>
               </div>
@@ -550,9 +545,9 @@ export const RegistrationFormModal: React.FC<RegistrationFormModalProps> = ({
               <div className="flex flex-wrap items-center justify-between gap-2 pt-2 text-[10px] font-mono text-slate-400">
                 <div className="flex items-center gap-2">
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>Supports UPI (GPay, PhonePe, Paytm), Credit/Debit Cards, NetBanking</span>
+                  <span>Supports UPI (GPay, PhonePe, Paytm, CRED), Credit/Debit Cards, NetBanking, Wallets</span>
                 </div>
-                <div>Powered by Cashfree Payments</div>
+                <div>Powered by Razorpay</div>
               </div>
             </form>
           )}
