@@ -399,24 +399,26 @@ export const RegistrationFormModal: React.FC<RegistrationFormModalProps> = ({
     printWindow.document.close();
   };
 
-  const handleDownloadRulebook = (url: string) => {
+  const handleDownloadRulebook = async (url: string) => {
     if (!url) return;
+    const fileName = decodeURIComponent(url.split('/').pop()?.split('?')[0] || 'ROBOVEDA26_RULEBOOK.pdf');
     try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('Download failed');
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
       const link = document.createElement('a');
-      link.href = encodeURI(url);
-      link.target = '_blank';
-      link.rel = 'noopener noreferrer';
-      const cleanName = decodeURIComponent(url.split('/').pop()?.split('?')[0] || 'ROBOVEDA26_RULEBOOK.pdf');
-      link.download = cleanName;
+      link.href = blobUrl;
+      link.download = fileName;
       document.body.appendChild(link);
       link.click();
       setTimeout(() => {
-        if (document.body.contains(link)) {
-          document.body.removeChild(link);
-        }
-      }, 200);
+        URL.revokeObjectURL(blobUrl);
+        if (document.body.contains(link)) document.body.removeChild(link);
+      }, 300);
     } catch {
-      window.open(encodeURI(url), '_blank');
+      // Fallback: open PDF in new tab
+      window.open(url, '_blank', 'noopener,noreferrer');
     }
   };
 
