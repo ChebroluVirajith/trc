@@ -90,7 +90,7 @@ export const RegistrationFormModal: React.FC<RegistrationFormModalProps> = ({
     TICKETS_DATA.find((t) => t.id === selectedTierId) || TICKETS_DATA[0];
 
   // Extract numerical amount from string like "₹1499"
-  const amountNumeric = parseInt(currentTier.price.replace(/[^\d]/g, ''), 10) || 1499;
+  const amountNumeric = parseInt(currentTier.price.replace(/[^\d]/g, ''), 10) || 10;
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;

@@ -5,7 +5,7 @@ export const TICKETS_DATA: TicketTier[] = [
     id: 'master-pass',
     title: 'Master Access Pass',
     badge: 'ALL-INCLUSIVE',
-    price: '₹1499',
+    price: '₹10',
     description: 'Ultimate festival pass granting multi-event entry, arena matches, flagship keynote sessions, and networking dinner.',
     features: [
       'Entry to all Combat & Arena Events',
