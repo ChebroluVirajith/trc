@@ -111,27 +111,45 @@ export default async function handler(req: any, res: any) {
 
     // Determine event rulebook
     const rulebookRelativePath = getRulebookPath(passTitle);
-    const origin = req.headers?.origin || 'https://trc-rv.vercel.app';
-    const rulebookDownloadUrl = `${origin}/${encodeURI(rulebookRelativePath)}`;
+    const origin = (req.headers?.origin || 'https://trc-rv.vercel.app').replace(/\/$/, '');
+    const cleanRelativePath = rulebookRelativePath.startsWith('/') ? rulebookRelativePath.substring(1) : rulebookRelativePath;
+    const rulebookDownloadUrl = `${origin}/${cleanRelativePath}`;
 
     // Send Greeting Email if SMTP credentials are provided
     let emailSent = false;
-    const smtpUser = process.env.SMTP_USER || process.env.EMAIL_USER || process.env.GMAIL_USER;
-    const smtpPass = process.env.SMTP_PASS || process.env.EMAIL_PASS || process.env.GMAIL_PASS;
-    const recipientEmail = customerEmail || req.body?.email;
+    let mailStatus = 'NOT_CONFIGURED';
+    let mailError: string | null = null;
+
+    const rawUser = process.env.SMTP_USER || process.env.EMAIL_USER || process.env.GMAIL_USER || '';
+    const rawPass = process.env.SMTP_PASS || process.env.EMAIL_PASS || process.env.GMAIL_PASS || '';
+    const smtpUser = rawUser.trim();
+    const smtpPass = rawPass.trim().replace(/\s+/g, ''); // Strip all spaces from App Passwords
+    const recipientEmail = (customerEmail || req.body?.email || '').trim();
 
     if (smtpUser && smtpPass && recipientEmail) {
       try {
-        const transporter = nodemailer.createTransport({
-          service: process.env.SMTP_SERVICE || 'gmail',
-          host: process.env.SMTP_HOST || 'smtp.gmail.com',
-          port: Number(process.env.SMTP_PORT) || 587,
-          secure: process.env.SMTP_SECURE === 'true',
-          auth: {
-            user: smtpUser,
-            pass: smtpPass
-          }
-        });
+        const isGmail = smtpUser.includes('@gmail.com') || process.env.SMTP_SERVICE === 'gmail';
+
+        const transporter = isGmail
+          ? nodemailer.createTransport({
+              service: 'gmail',
+              auth: {
+                user: smtpUser,
+                pass: smtpPass
+              }
+            })
+          : nodemailer.createTransport({
+              host: process.env.SMTP_HOST || 'smtp.gmail.com',
+              port: Number(process.env.SMTP_PORT) || 587,
+              secure: Number(process.env.SMTP_PORT) === 465 || process.env.SMTP_SECURE === 'true',
+              auth: {
+                user: smtpUser,
+                pass: smtpPass
+              },
+              tls: {
+                rejectUnauthorized: false
+              }
+            });
 
         const delegateName = customerName || 'Delegate';
         const eventOrPass = passTitle || "ROBOVEDA'26 Pass";
@@ -202,11 +220,21 @@ export default async function handler(req: any, res: any) {
           subject: `🎉 Registration Confirmed: ${eventOrPass} | ROBOVEDA'26 Rulebook & Pass`,
           html: htmlContent
         });
+
         emailSent = true;
+        mailStatus = 'SENT';
         console.log(`Greeting email dispatched successfully to ${recipientEmail}`);
-      } catch (mailErr) {
-        console.warn('Could not send automated confirmation email:', mailErr);
+      } catch (mailErr: any) {
+        mailStatus = 'FAILED';
+        mailError = mailErr?.message || 'Failed to dispatch email';
+        console.error('Could not send automated confirmation email:', mailErr);
       }
+    } else {
+      console.warn('SMTP credentials not fully configured or recipient email missing.', {
+        hasUser: Boolean(smtpUser),
+        hasPass: Boolean(smtpPass),
+        hasRecipient: Boolean(recipientEmail)
+      });
     }
 
     return res.status(200).json({
@@ -218,6 +246,8 @@ export default async function handler(req: any, res: any) {
       payment_status: 'SUCCESS',
       rulebook_url: rulebookDownloadUrl,
       email_sent: emailSent,
+      mail_status: mailStatus,
+      mail_error: mailError,
       payment_time: new Date().toISOString(),
       message: 'Payment verified successfully.'
     });

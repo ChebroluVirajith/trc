@@ -23,7 +23,7 @@ const DOMAINS: CompetitionDomain[] = [
     subtitle: 'HEAVYWEIGHT BATTLES & DOJO SUMO',
     desc: 'Pure mechanical force, armor plating, spinning blades, and crushing torque. Robots clash in reinforced arenas with strict safety lockdowns.',
     primaryEvent: 'RANAVEERA & YODDHA',
-    rulebook: "/RV 25 Rule books/RANAVEERA RV'25 new.pdf",
+    rulebook: '/rulebooks/ranaveera.pdf',
     icon: <Swords className="w-6 h-6 text-gold" />,
     specs: [
       { label: 'WEIGHT CLASS', value: 'UP TO 50 KG' },
@@ -39,7 +39,7 @@ const DOMAINS: CompetitionDomain[] = [
     subtitle: 'MULTIROTOR DYNAMICS & AGILITY',
     desc: 'High-speed drone pilots navigate 3D aerial rings, altitude drops, precision gates, and aerodynamic stability trials against the clock.',
     primaryEvent: 'PUSHPAK',
-    rulebook: '/RV 25 Rule books/PUSPHAK RV 25.pdf',
+    rulebook: '/rulebooks/pushpak.pdf',
     icon: <Plane className="w-6 h-6 text-cyan-400" />,
     specs: [
       { label: 'FRAME CLASS', value: '250MM - 450MM' },
@@ -55,7 +55,7 @@ const DOMAINS: CompetitionDomain[] = [
     subtitle: 'PID OPTICAL TRACKING & MULTI-AGENT SWARMS',
     desc: 'Microcontroller algorithms and optical IR sensor arrays executing high-speed line following, dead reckoning, and dual-robot synchronized teamwork.',
     primaryEvent: 'LAKSHMANAREKHA & SAMANVAYI',
-    rulebook: "/RV 25 Rule books/LAKSHMANREKHA RV'25 new.pdf",
+    rulebook: '/rulebooks/lakshmanarekha.pdf',
     icon: <Compass className="w-6 h-6 text-emerald-400" />,
     specs: [
       { label: 'CONTROL LOOP', value: 'PID TUNING' },
@@ -71,7 +71,7 @@ const DOMAINS: CompetitionDomain[] = [
     subtitle: 'FORMULA ROBO RACING & GRIPPER ARMS',
     desc: 'Track racers hitting apex hairpins at breakneck velocity, alongside articulated robotic arms sorting multi-tier engineering payloads.',
     primaryEvent: 'GATI & YANTRAA',
-    rulebook: "/RV 25 Rule books/GATI RV'25.pdf",
+    rulebook: '/rulebooks/gati.pdf',
     icon: <Zap className="w-6 h-6 text-gold-light" />,
     specs: [
       { label: 'DRIVE TRAIN', value: 'DIFFERENTIAL 12V' },

@@ -400,15 +400,24 @@ export const RegistrationFormModal: React.FC<RegistrationFormModalProps> = ({
   };
 
   const handleDownloadRulebook = (url: string) => {
-    const cleanUrl = encodeURI(url);
-    const link = document.createElement('a');
-    link.href = cleanUrl;
-    link.target = '_blank';
-    link.rel = 'noopener noreferrer';
-    link.download = url.split('/').pop() || 'ROBOVEDA26_RULEBOOK.pdf';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    if (!url) return;
+    try {
+      const link = document.createElement('a');
+      link.href = url;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      const cleanName = url.split('/').pop()?.split('?')[0] || 'ROBOVEDA26_RULEBOOK.pdf';
+      link.download = cleanName;
+      document.body.appendChild(link);
+      link.click();
+      setTimeout(() => {
+        if (document.body.contains(link)) {
+          document.body.removeChild(link);
+        }
+      }, 200);
+    } catch {
+      window.open(url, '_blank');
+    }
   };
 
   const isTeamPass =
@@ -454,7 +463,10 @@ export const RegistrationFormModal: React.FC<RegistrationFormModalProps> = ({
           {step === 'success' && (
             <div className="space-y-6 animate-in zoom-in-95 duration-200">
               {(() => {
-                const rulebookUrl = paymentResult?.rulebook_url || getRulebookForEvent(eventName || currentTier.title);
+                const rulebookUrl =
+                  paymentResult?.rulebook_url ||
+                  getRulebookForEvent(eventName || currentTier.title) ||
+                  '/rulebooks/ranaveera.pdf';
                 return (
                   <>
                     <div className="text-center space-y-2">
