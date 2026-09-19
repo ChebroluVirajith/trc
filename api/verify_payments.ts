@@ -6,29 +6,29 @@ import crypto from 'crypto';
 import nodemailer from 'nodemailer';
 
 const EVENT_RULEBOOK_LINKS: Record<string, string> = {
-  'ranaveera': "RV 25 Rule books/RANAVEERA RV'25 new.pdf",
-  'pushpak': "RV 25 Rule books/PUSPHAK RV 25.pdf",
-  'sarvaagami': "RV 25 Rule books/SARVAAGAMI RV'25.pdf",
-  'sarvagami': "RV 25 Rule books/SARVAAGAMI RV'25.pdf",
-  'yoddha': "RV 25 Rule books/YODDHA RV'25.pdf",
-  'lakshmanarekha': "RV 25 Rule books/LAKSHMANREKHA RV'25 new.pdf",
-  'lakshman rekha': "RV 25 Rule books/LAKSHMANREKHA RV'25 new.pdf",
-  'gati': "RV 25 Rule books/GATI RV'25.pdf",
-  'goalaa': "RV 25 Rule books/GOALAA RV'25 new.pdf",
-  'goala': "RV 25 Rule books/GOALAA RV'25 new.pdf",
-  'yantraa': "RV 25 Rule books/YANTRAA RV'25.pdf",
-  'yantra': "RV 25 Rule books/YANTRAA RV'25.pdf",
-  'samanvayi': "RV 25 Rule books/SAMANVAYI RV'25new.pdf",
-  'jaladhmatra': "RV 25 Rule books/JALADHMATRA RV'25.pdf"
+  'ranaveera': 'rulebooks/ranaveera.pdf',
+  'pushpak': 'rulebooks/pushpak.pdf',
+  'sarvaagami': 'rulebooks/sarvaagami.pdf',
+  'sarvagami': 'rulebooks/sarvaagami.pdf',
+  'yoddha': 'rulebooks/yoddha.pdf',
+  'lakshmanarekha': 'rulebooks/lakshmanarekha.pdf',
+  'lakshman rekha': 'rulebooks/lakshmanarekha.pdf',
+  'gati': 'rulebooks/gati.pdf',
+  'goalaa': 'rulebooks/goalaa.pdf',
+  'goala': 'rulebooks/goalaa.pdf',
+  'yantraa': 'rulebooks/yantraa.pdf',
+  'yantra': 'rulebooks/yantraa.pdf',
+  'samanvayi': 'rulebooks/samanvayi.pdf',
+  'jaladhmatra': 'rulebooks/jaladhmatra.pdf'
 };
 
 function getRulebookPath(title?: string): string {
-  if (!title) return "RV 25 Rule books/RANAVEERA RV'25 new.pdf";
+  if (!title) return 'rulebooks/ranaveera.pdf';
   const lower = title.toLowerCase();
   for (const [key, path] of Object.entries(EVENT_RULEBOOK_LINKS)) {
     if (lower.includes(key)) return path;
   }
-  return "RV 25 Rule books/RANAVEERA RV'25 new.pdf";
+  return 'rulebooks/ranaveera.pdf';
 }
 
 export default async function handler(req: any, res: any) {
