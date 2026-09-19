@@ -154,66 +154,31 @@ export const verifyRazorpayPayment = async (verificationData: {
   college?: string;
   amount?: number;
 }): Promise<PaymentVerificationResult> => {
+  const response = await fetch('/api/verify-payment', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(verificationData)
+  });
+
+  const rawText = await response.text();
+  let data: any = null;
   try {
-    const response = await fetch('/api/verify-payment', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(verificationData)
-    });
-
-    const rawText = await response.text();
-    let data: any = null;
-    try {
-      data = JSON.parse(rawText);
-    } catch {
-      // Non-JSON response (e.g. local dev without serverless api)
-    }
-
-    if (response.ok && data && data.success) {
-      return data;
-    }
-
-    if (data && data.error) {
-      throw new Error(data.error);
-    }
-
-    // Fallback: If backend returned non-JSON / 404 in local dev mode,
-    // Razorpay already authenticated payment successfully on the client
-    if (verificationData.razorpay_payment_id) {
-      return {
-        success: true,
-        order_id: verificationData.razorpay_order_id,
-        payment_id: verificationData.razorpay_payment_id,
-        transaction_id: verificationData.razorpay_payment_id,
-        order_status: 'PAID',
-        payment_status: 'SUCCESS',
-        payment_time: new Date().toISOString(),
-        message: 'Payment authorized and verified successfully.'
-      };
-    }
-
-    throw new Error('Payment verification failed.');
-  } catch (err: any) {
-    if (err?.message?.includes('Signature mismatch') || err?.message?.includes('verification failed')) {
-      throw err;
-    }
-
-    // If network error occurred but Razorpay succeeded on client
-    if (verificationData.razorpay_payment_id) {
-      return {
-        success: true,
-        order_id: verificationData.razorpay_order_id,
-        payment_id: verificationData.razorpay_payment_id,
-        transaction_id: verificationData.razorpay_payment_id,
-        order_status: 'PAID',
-        payment_status: 'SUCCESS',
-        payment_time: new Date().toISOString()
-      };
-    }
-    throw err;
+    data = JSON.parse(rawText);
+  } catch {
+    // Non-JSON response
   }
+
+  if (response.ok && data && data.success) {
+    return data;
+  }
+
+  if (data && data.error) {
+    throw new Error(data.error);
+  }
+
+  throw new Error(`Payment verification failed: server returned ${response.status}`);
 };
 
 /**

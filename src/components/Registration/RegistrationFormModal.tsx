@@ -466,7 +466,7 @@ export const RegistrationFormModal: React.FC<RegistrationFormModalProps> = ({
                 const rulebookUrl =
                   paymentResult?.rulebook_url ||
                   getRulebookForEvent(eventName || currentTier.title) ||
-                  "/RV 25 Rule books/RANAVEERA RV'25 new.pdf";
+                  '/rulebooks/ranaveera.pdf';
                 return (
                   <>
                     <div className="text-center space-y-2">
