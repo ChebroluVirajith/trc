@@ -72,7 +72,7 @@ export const App: React.FC = () => {
         <PosterCarouselSection onOpenRegister={handleOpenTicketModal} />
 
         {/* 5. Unified Festival Events Directory (#events): 10 Robotics Events, Workshops, Pradarshan & Hackathon */}
-        <EventsSection onOpenRegister={handleOpenTicketModal} />
+        <EventsSection onOpenRegister={(tierId, eventName) => handleOpenRegistration(tierId || 'single-event-pass', eventName)} />
 
         {/* 6. Our Team (#ourteam): 12 Organizing Directorates */}
         <TeamSection />

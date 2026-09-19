@@ -9,7 +9,7 @@ import { Calendar, MapPin, Sparkles, Trophy, Flame, Filter, ChevronRight, Layers
 import { audioEngine } from '../../utils/audioEngine';
 
 interface EventsSectionProps {
-  onOpenRegister: () => void;
+  onOpenRegister: (tierId?: string, eventName?: string) => void;
 }
 
 const CATEGORY_STYLES: Record<string, { badge: string; border: string; glow: string }> = {
@@ -325,9 +325,10 @@ export const EventsSection: React.FC<EventsSectionProps> = ({ onOpenRegister }) 
                     <button
                       onClick={() => {
                         audioEngine.playClick();
-                        onOpenRegister();
+                        const tier = slot.category === 'Workshop' ? 'workshop-pass' : 'single-event-pass';
+                        onOpenRegister(tier, slot.eventName);
                       }}
-                      className="flex-1 py-1.5 px-2.5 bg-gradient-to-r from-gold-light via-gold to-gold-amber hover:from-white hover:to-gold-light text-black font-mono text-[11px] font-black rounded transition-transform hover:scale-105 text-center shadow-md"
+                      className="flex-1 py-1.5 px-2.5 bg-gradient-to-r from-gold-light via-gold to-gold-amber hover:from-white hover:to-gold-light text-black font-mono text-[11px] font-black rounded transition-transform hover:scale-105 text-center shadow-md cursor-pointer"
                     >
                       REGISTER
                     </button>
@@ -344,8 +345,14 @@ export const EventsSection: React.FC<EventsSectionProps> = ({ onOpenRegister }) 
         event={selectedEvent}
         onClose={() => setSelectedEvent(null)}
         onRegister={() => {
+          const evt = selectedEvent;
           setSelectedEvent(null);
-          onOpenRegister();
+          if (evt) {
+            const tier = evt.category === 'Workshop' ? 'workshop-pass' : 'single-event-pass';
+            onOpenRegister(tier, evt.name);
+          } else {
+            onOpenRegister('single-event-pass');
+          }
         }}
       />
     </section>

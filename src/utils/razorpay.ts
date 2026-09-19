@@ -41,6 +41,8 @@ export interface PaymentVerificationResult {
   order_status: string;
   payment_status: 'SUCCESS' | 'FAILED';
   payment_time: string;
+  rulebook_url?: string;
+  email_sent?: boolean;
   message?: string;
 }
 
@@ -140,12 +142,17 @@ export const createRazorpayOrder = async (params: OrderCreationParams): Promise<
 };
 
 /**
- * Calls backend /api/verify-payment to verify HMAC-SHA256 signature
+ * Calls backend /api/verify-payment to verify HMAC-SHA256 signature and trigger greeting email
  */
 export const verifyRazorpayPayment = async (verificationData: {
   razorpay_order_id: string;
   razorpay_payment_id: string;
   razorpay_signature: string;
+  customerName?: string;
+  customerEmail?: string;
+  passTitle?: string;
+  college?: string;
+  amount?: number;
 }): Promise<PaymentVerificationResult> => {
   try {
     const response = await fetch('/api/verify-payment', {
@@ -169,7 +176,6 @@ export const verifyRazorpayPayment = async (verificationData: {
     }
 
     if (data && data.error) {
-      // If signature explicitly failed on backend
       throw new Error(data.error);
     }
 
@@ -270,11 +276,15 @@ export const triggerRazorpayCheckout = async ({
         razorpay_signature: string;
       }) {
         try {
-          // Verify signature on the backend with safe parsing
+          // Verify signature on the backend with customer info for greeting email
           const verificationResult = await verifyRazorpayPayment({
             razorpay_order_id: response.razorpay_order_id || order.order_id,
             razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_signature: response.razorpay_signature
+            razorpay_signature: response.razorpay_signature,
+            customerName: customer.name,
+            customerEmail: customer.email,
+            passTitle,
+            college: customer.college
           });
           onSuccess(verificationResult);
         } catch (verifyErr: any) {

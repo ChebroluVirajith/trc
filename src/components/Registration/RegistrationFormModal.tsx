@@ -11,6 +11,7 @@ import {
   ArrowRight,
   RefreshCw,
   Lock,
+  FileText,
   User,
   Mail,
   Phone,
@@ -20,6 +21,7 @@ import {
 import { TechnicalBadge } from '../Common/TechnicalBadge';
 import { TICKETS_DATA } from '../../data/ticketsData';
 import { TicketTier } from '../../types';
+import { getRulebookForEvent } from '../../utils/rulebooks';
 import {
   createRazorpayOrder,
   triggerRazorpayCheckout,
@@ -89,7 +91,7 @@ export const RegistrationFormModal: React.FC<RegistrationFormModalProps> = ({
   const currentTier: TicketTier =
     TICKETS_DATA.find((t) => t.id === selectedTierId) || TICKETS_DATA[0];
 
-  // Extract numerical amount from string like "₹1499"
+  // Extract numerical amount from string like "₹10"
   const amountNumeric = parseInt(currentTier.price.replace(/[^\d]/g, ''), 10) || 10;
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -165,8 +167,236 @@ export const RegistrationFormModal: React.FC<RegistrationFormModalProps> = ({
     }
   };
 
+  const handleDownloadPassImage = () => {
+    const canvas = document.createElement('canvas');
+    const width = 1200;
+    const height = 720;
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Background gradient
+    const bgGrad = ctx.createLinearGradient(0, 0, width, height);
+    bgGrad.addColorStop(0, '#0a111e');
+    bgGrad.addColorStop(0.5, '#0f1929');
+    bgGrad.addColorStop(1, '#15243b');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, width, height);
+
+    // Outer Gold Border & Corners
+    ctx.strokeStyle = '#d4af37';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(20, 20, width - 40, height - 40);
+
+    ctx.strokeStyle = '#fce49c';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(30, 30, width - 60, height - 60);
+
+    // Top header ribbon
+    ctx.fillStyle = '#d4af37';
+    ctx.font = 'bold 16px monospace';
+    ctx.fillText('OFFICIAL DELEGATE PASS // ISO 20121:2012 CERTIFIED', 50, 75);
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '900 44px sans-serif';
+    ctx.fillText("ROBOVEDA'26 — ASCENSION", 50, 130);
+
+    ctx.fillStyle = '#22c55e';
+    ctx.font = 'bold 18px monospace';
+    ctx.fillText('● VERIFIED PAID & REGISTERED', width - 380, 75);
+
+    // Divider Line
+    ctx.strokeStyle = 'rgba(212, 175, 55, 0.4)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(50, 160);
+    ctx.lineTo(width - 50, 160);
+    ctx.stroke();
+
+    // Field details
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '13px monospace';
+    ctx.fillText('PASS HOLDER NAME:', 50, 210);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 24px sans-serif';
+    ctx.fillText(formData.name.toUpperCase(), 50, 245);
+
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '13px monospace';
+    ctx.fillText('PASS CATEGORY & TIER:', 50, 300);
+    ctx.fillStyle = '#fce49c';
+    ctx.font = 'bold 20px sans-serif';
+    const tierName = `${currentTier.title} ${eventName ? `(${eventName})` : ''}`;
+    ctx.fillText(tierName.toUpperCase(), 50, 330);
+
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '13px monospace';
+    ctx.fillText('COLLEGE / INSTITUTION:', 50, 385);
+    ctx.fillStyle = '#e2e8f0';
+    ctx.font = 'bold 16px sans-serif';
+    ctx.fillText(formData.college.substring(0, 55), 50, 415);
+
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '13px monospace';
+    ctx.fillText('CONTACT / EMAIL:', 50, 465);
+    ctx.fillStyle = '#e2e8f0';
+    ctx.font = '15px monospace';
+    ctx.fillText(`${formData.phone}  |  ${formData.email}`, 50, 495);
+
+    // Right Column: Order ID & Venue Info
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '13px monospace';
+    ctx.fillText('ORDER ID / TXN REF:', 620, 210);
+    ctx.fillStyle = '#38bdf8';
+    ctx.font = 'bold 16px monospace';
+    ctx.fillText(activeOrderId || 'RV26_PAID', 620, 240);
+    if (paymentResult?.payment_id) {
+      ctx.font = '13px monospace';
+      ctx.fillText(`TXN: ${paymentResult.payment_id}`, 620, 265);
+    }
+
+    if (formData.teamName) {
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '13px monospace';
+      ctx.fillText('TEAM SQUAD:', 620, 315);
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = 'bold 18px sans-serif';
+      ctx.fillText(formData.teamName.toUpperCase(), 620, 345);
+    }
+
+    // Draw simulated QR Code matrix block
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(950, 370, 180, 180);
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(965, 385, 45, 45);
+    ctx.fillRect(1070, 385, 45, 45);
+    ctx.fillRect(965, 490, 45, 45);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(975, 395, 25, 25);
+    ctx.fillRect(1080, 395, 25, 25);
+    ctx.fillRect(975, 500, 25, 25);
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(982, 402, 11, 11);
+    ctx.fillRect(1087, 402, 11, 11);
+    ctx.fillRect(982, 507, 11, 11);
+    for (let i = 0; i < 6; i++) {
+      for (let j = 0; j < 6; j++) {
+        if ((i + j) % 2 === 0) {
+          ctx.fillRect(1030 + i * 8, 440 + j * 8, 6, 6);
+        }
+      }
+    }
+
+    // Bottom venue footer
+    ctx.strokeStyle = 'rgba(212, 175, 55, 0.4)';
+    ctx.beginPath();
+    ctx.moveTo(50, 570);
+    ctx.lineTo(width - 50, 570);
+    ctx.stroke();
+
+    ctx.fillStyle = '#d4af37';
+    ctx.font = 'bold 15px monospace';
+    ctx.fillText('VENUE: SREENIDHI INSTITUTE OF SCIENCE & TECHNOLOGY (SNIST), HYDERABAD', 50, 610);
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '13px monospace';
+    ctx.fillText('PRESENT THIS DIGITAL PASS AT FESTIVAL REGISTRATION DESK FOR ARENA ENTRY', 50, 635);
+
+    // Trigger Download
+    const link = document.createElement('a');
+    const safeName = formData.name.trim().replace(/[^a-zA-Z0-9]/g, '_') || 'DELEGATE';
+    link.download = `ROBOVEDA26_PASS_${safeName}.png`;
+    link.href = canvas.toDataURL('image/png');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const handlePrintPass = () => {
-    window.print();
+    const printWindow = window.open('', '_blank', 'width=900,height=700');
+    if (!printWindow) {
+      window.print();
+      return;
+    }
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>ROBOVEDA'26 Digital Pass - ${formData.name}</title>
+          <style>
+            body {
+              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+              background: #0a111e;
+              color: #fff;
+              padding: 30px;
+              margin: 0;
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            .pass-box {
+              border: 2px solid #d4af37;
+              padding: 30px;
+              background: #0f1929;
+              border-radius: 8px;
+              box-shadow: 0 0 20px rgba(212,175,55,0.3);
+            }
+            h1 { color: #d4af37; margin: 0 0 10px 0; }
+            .highlight { color: #fce49c; font-weight: bold; }
+            .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0; }
+            .label { color: #94a3b8; font-size: 11px; text-transform: uppercase; font-family: monospace; }
+            .value { font-size: 16px; font-weight: bold; color: #fff; margin-top: 2px; }
+            .footer { border-top: 1px solid rgba(212,175,55,0.4); padding-top: 15px; margin-top: 20px; font-size: 12px; color: #d4af37; font-family: monospace; }
+          </style>
+        </head>
+        <body>
+          <div class="pass-box">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <div style="color:#d4af37; font-family:monospace; font-size:12px;">OFFICIAL DELEGATE PASS // ISO 20121:2012</div>
+                <h1>ROBOVEDA'26 — ASCENSION</h1>
+              </div>
+              <div style="padding:6px 14px; background:rgba(34,197,94,0.2); border:1px solid #22c55e; color:#22c55e; font-family:monospace; font-weight:bold; border-radius:4px;">
+                VERIFIED PAID
+              </div>
+            </div>
+            <div class="grid">
+              <div>
+                <div class="label">Pass Holder:</div>
+                <div class="value">${formData.name}</div>
+              </div>
+              <div>
+                <div class="label">Pass Category:</div>
+                <div class="value highlight">${currentTier.title} ${eventName ? `(${eventName})` : ''}</div>
+              </div>
+              <div>
+                <div class="label">College / Institution:</div>
+                <div class="value">${formData.college}</div>
+              </div>
+              <div>
+                <div class="label">Contact / Email:</div>
+                <div class="value">${formData.phone} | ${formData.email}</div>
+              </div>
+              <div>
+                <div class="label">Order / TXN Ref:</div>
+                <div class="value" style="color:#38bdf8; font-family:monospace;">${activeOrderId} ${paymentResult?.payment_id ? `// ${paymentResult.payment_id}` : ''}</div>
+              </div>
+              ${formData.teamName ? `<div><div class="label">Team Name:</div><div class="value highlight">${formData.teamName}</div></div>` : ''}
+            </div>
+            <div class="footer">
+              <div>VENUE: SNIST CAMPUS, HYDERABAD</div>
+              <div style="color:#94a3b8; margin-top:4px;">PRESENT THIS PASS AT REGISTRATION DESK FOR ARENA ACCESS</div>
+            </div>
+          </div>
+          <script>
+            window.onload = function() {
+              window.print();
+            };
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
   };
 
   const isTeamPass =
@@ -211,113 +441,154 @@ export const RegistrationFormModal: React.FC<RegistrationFormModalProps> = ({
           {/* STEP: SUCCESS PASS DISPLAY */}
           {step === 'success' && (
             <div className="space-y-6 animate-in zoom-in-95 duration-200">
-              <div className="text-center space-y-2">
-                <div className="inline-flex p-3 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
-                  <CheckCircle2 className="w-10 h-10 animate-bounce" />
-                </div>
-                <h3 className="text-2xl sm:text-3xl font-display font-black text-white uppercase">
-                  REGISTRATION CONFIRMED!
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-300 font-sans">
-                  Your payment has been successfully verified via Razorpay. Welcome to ROBOVEDA'26 ASCENSION!
-                </p>
-              </div>
-
-              {/* Digital Verified Pass Card */}
-              <div
-                id="digital-pass"
-                className="relative bg-gradient-to-br from-[#0d1624] to-[#12233b] border-2 border-gold p-6 sm:p-8 rounded-lg shadow-[0_0_40px_rgba(212,175,55,0.3)] space-y-6 print:border-black print:text-black"
-              >
-                {/* Hologram / Ribbon */}
-                <div className="flex items-center justify-between border-b border-gold/30 pb-4">
-                  <div className="space-y-1">
-                    <span className="font-mono text-[10px] text-gold tracking-widest uppercase">
-                      OFFICIAL DELEGATE PASS // ISO 20121:2012
-                    </span>
-                    <h4 className="text-2xl font-black font-display text-white tracking-wide">
-                      ROBOVEDA'26
-                    </h4>
-                  </div>
-                  <div className="text-right">
-                    <span className="px-3 py-1 bg-gold/20 border border-gold text-gold font-mono text-xs font-bold uppercase rounded">
-                      VERIFIED PAID
-                    </span>
-                  </div>
-                </div>
-
-                {/* Candidate & Pass Info Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-mono">
-                  <div className="space-y-1">
-                    <span className="text-slate-400 uppercase text-[10px]">PASS HOLDER:</span>
-                    <div className="text-base font-bold text-white uppercase">{formData.name}</div>
-                  </div>
-
-                  <div className="space-y-1">
-                    <span className="text-slate-400 uppercase text-[10px]">PASS CATEGORY:</span>
-                    <div className="text-sm font-bold text-gold-light uppercase">
-                      {currentTier.title} {eventName ? `(${eventName})` : ''}
+              {(() => {
+                const rulebookUrl = paymentResult?.rulebook_url || getRulebookForEvent(eventName || currentTier.title);
+                return (
+                  <>
+                    <div className="text-center space-y-2">
+                      <div className="inline-flex p-3 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
+                        <CheckCircle2 className="w-10 h-10 animate-bounce" />
+                      </div>
+                      <h3 className="text-2xl sm:text-3xl font-display font-black text-white uppercase">
+                        REGISTRATION CONFIRMED!
+                      </h3>
+                      <p className="text-xs sm:text-sm text-slate-300 font-sans">
+                        Your payment has been successfully verified via Razorpay. Welcome to ROBOVEDA'26 ASCENSION!
+                      </p>
                     </div>
-                  </div>
 
-                  <div className="space-y-1">
-                    <span className="text-slate-400 uppercase text-[10px]">COLLEGE / INSTITUTION:</span>
-                    <div className="text-xs text-slate-200">{formData.college}</div>
-                  </div>
+                    {formData.email && (
+                      <div className="p-3.5 bg-gold/10 border border-gold/40 rounded tech-corner-border text-gold-light text-xs font-mono flex items-center gap-3">
+                        <Mail className="w-4 h-4 text-gold flex-shrink-0" />
+                        <span>
+                          A greeting confirmation email with your event pass details & official rulebook link has been dispatched to <strong>{formData.email}</strong>.
+                        </span>
+                      </div>
+                    )}
 
-                  <div className="space-y-1">
-                    <span className="text-slate-400 uppercase text-[10px]">CONTACT / EMAIL:</span>
-                    <div className="text-xs text-slate-200">
-                      {formData.phone} | {formData.email}
+                    {/* Digital Verified Pass Card */}
+                    <div
+                      id="digital-pass"
+                      className="relative bg-gradient-to-br from-[#0d1624] to-[#12233b] border-2 border-gold p-6 sm:p-8 rounded-lg shadow-[0_0_40px_rgba(212,175,55,0.3)] space-y-6 print:border-black print:text-black"
+                    >
+                      {/* Hologram / Ribbon */}
+                      <div className="flex items-center justify-between border-b border-gold/30 pb-4">
+                        <div className="space-y-1">
+                          <span className="font-mono text-[10px] text-gold tracking-widest uppercase">
+                            OFFICIAL DELEGATE PASS // ISO 20121:2012
+                          </span>
+                          <h4 className="text-2xl font-black font-display text-white tracking-wide">
+                            ROBOVEDA'26
+                          </h4>
+                        </div>
+                        <div className="text-right">
+                          <span className="px-3 py-1 bg-gold/20 border border-gold text-gold font-mono text-xs font-bold uppercase rounded">
+                            VERIFIED PAID
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Candidate & Pass Info Grid */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-mono">
+                        <div className="space-y-1">
+                          <span className="text-slate-400 uppercase text-[10px]">PASS HOLDER:</span>
+                          <div className="text-base font-bold text-white uppercase">{formData.name}</div>
+                        </div>
+
+                        <div className="space-y-1">
+                          <span className="text-slate-400 uppercase text-[10px]">PASS CATEGORY:</span>
+                          <div className="text-sm font-bold text-gold-light uppercase">
+                            {currentTier.title} {eventName ? `(${eventName})` : ''}
+                          </div>
+                        </div>
+
+                        <div className="space-y-1">
+                          <span className="text-slate-400 uppercase text-[10px]">COLLEGE / INSTITUTION:</span>
+                          <div className="text-xs text-slate-200">{formData.college}</div>
+                        </div>
+
+                        <div className="space-y-1">
+                          <span className="text-slate-400 uppercase text-[10px]">CONTACT / EMAIL:</span>
+                          <div className="text-xs text-slate-200">
+                            {formData.phone} | {formData.email}
+                          </div>
+                        </div>
+
+                        {formData.teamName && (
+                          <div className="space-y-1">
+                            <span className="text-slate-400 uppercase text-[10px]">TEAM NAME:</span>
+                            <div className="text-xs text-cyan-300 font-bold">{formData.teamName}</div>
+                          </div>
+                        )}
+
+                        <div className="space-y-1">
+                          <span className="text-slate-400 uppercase text-[10px]">ORDER & TXN REF:</span>
+                          <div className="text-xs text-slate-300 font-mono">
+                            {activeOrderId} {paymentResult?.payment_id ? `// ${paymentResult.payment_id}` : ''}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Venue & QR Footer */}
+                      <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-gold/30">
+                        <div className="space-y-0.5 text-[11px] font-mono text-slate-300">
+                          <div className="text-gold font-bold">VENUE: SNIST CAMPUS, HYDERABAD</div>
+                          <div className="text-slate-400">PRESENT THIS PASS AT REGISTRATION DESK</div>
+                        </div>
+                        <div className="flex items-center gap-2 p-2 bg-white text-black rounded border border-gold/60">
+                          <QrCode className="w-10 h-10" />
+                          <div className="text-[9px] font-mono leading-tight font-bold">
+                            SCAN<br />DELEGATE<br />BADGE
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                  </div>
 
-                  {formData.teamName && (
-                    <div className="space-y-1">
-                      <span className="text-slate-400 uppercase text-[10px]">TEAM NAME:</span>
-                      <div className="text-xs text-cyan-300 font-bold">{formData.teamName}</div>
+                    {/* Success Action Buttons */}
+                    <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
+                      <div className="flex flex-wrap items-center gap-2.5">
+                        <button
+                          type="button"
+                          onClick={handleDownloadPassImage}
+                          className="px-5 py-3 bg-gradient-to-r from-gold-light via-gold to-gold-amber hover:from-white text-black font-mono font-bold text-xs uppercase tracking-wider flex items-center gap-2 transition-all shadow-lg cursor-pointer"
+                        >
+                          <Download className="w-4 h-4" />
+                          <span>DOWNLOAD DIGITAL PASS (PNG)</span>
+                        </button>
+
+                        {rulebookUrl && (
+                          <a
+                            href={rulebookUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            download
+                            className="px-4 py-3 bg-black hover:bg-slate-900 text-cyan-300 border border-cyan-400/60 hover:border-cyan-300 font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-colors cursor-pointer shadow-md"
+                          >
+                            <FileText className="w-4 h-4 text-cyan-400" />
+                            <span>DOWNLOAD RULEBOOK (PDF)</span>
+                          </a>
+                        )}
+
+                        <button
+                          type="button"
+                          onClick={handlePrintPass}
+                          className="px-4 py-3 bg-surface hover:bg-slate-800 text-gold-light border border-gold/40 hover:border-gold font-mono text-xs uppercase tracking-wider flex items-center gap-2 transition-colors cursor-pointer"
+                        >
+                          <span>PRINT / SAVE PDF</span>
+                        </button>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={onClose}
+                        className="px-5 py-3 bg-surface hover:bg-slate-800 text-slate-200 border border-gold/40 font-mono text-xs uppercase tracking-wider transition-colors ml-auto cursor-pointer"
+                      >
+                        RETURN TO FESTIVAL
+                      </button>
                     </div>
-                  )}
-
-                  <div className="space-y-1">
-                    <span className="text-slate-400 uppercase text-[10px]">ORDER & TXN REF:</span>
-                    <div className="text-xs text-slate-300 font-mono">
-                      {activeOrderId} {paymentResult?.payment_id ? `// ${paymentResult.payment_id}` : ''}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Venue & QR Footer */}
-                <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-gold/30">
-                  <div className="space-y-0.5 text-[11px] font-mono text-slate-300">
-                    <div className="text-gold font-bold">VENUE: SNIST CAMPUS, HYDERABAD</div>
-                    <div className="text-slate-400">PRESENT THIS PASS AT REGISTRATION DESK</div>
-                  </div>
-                  <div className="flex items-center gap-2 p-2 bg-white text-black rounded border border-gold/60">
-                    <QrCode className="w-10 h-10" />
-                    <div className="text-[9px] font-mono leading-tight font-bold">
-                      SCAN<br />DELEGATE<br />BADGE
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Success Action Buttons */}
-              <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
-                <button
-                  onClick={handlePrintPass}
-                  className="px-5 py-3 bg-gradient-to-r from-gold-light via-gold to-gold-amber hover:from-white text-black font-mono font-bold text-xs uppercase tracking-wider flex items-center gap-2 transition-all shadow-lg"
-                >
-                  <Download className="w-4 h-4" />
-                  <span>DOWNLOAD / PRINT PASS</span>
-                </button>
-
-                <button
-                  onClick={onClose}
-                  className="px-5 py-3 bg-surface hover:bg-slate-800 text-slate-200 border border-gold/40 font-mono text-xs uppercase tracking-wider transition-colors ml-auto"
-                >
-                  RETURN TO FESTIVAL
-                </button>
-              </div>
+                  </>
+                );
+              })()}
             </div>
           )}
 
