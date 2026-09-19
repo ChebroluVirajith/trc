@@ -21,7 +21,7 @@ export const TICKETS_DATA: TicketTier[] = [
     id: 'single-event-pass',
     title: 'Single Event Entry',
     badge: 'STANDARD',
-    price: '₹8',
+    price: '₹1',
     description: 'Registration pass for a single competition category (Ranaveera, Pushpak, Gati, etc.) for team pilots.',
     features: [
       'Entry to 1 Selected Competitive Event',
