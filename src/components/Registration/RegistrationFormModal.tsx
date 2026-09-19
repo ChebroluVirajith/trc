@@ -399,6 +399,18 @@ export const RegistrationFormModal: React.FC<RegistrationFormModalProps> = ({
     printWindow.document.close();
   };
 
+  const handleDownloadRulebook = (url: string) => {
+    const cleanUrl = encodeURI(url);
+    const link = document.createElement('a');
+    link.href = cleanUrl;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.download = url.split('/').pop() || 'ROBOVEDA26_RULEBOOK.pdf';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const isTeamPass =
     selectedTierId === 'single-event-pass' ||
     selectedTierId === 'pradarshan-combo' ||
@@ -557,16 +569,14 @@ export const RegistrationFormModal: React.FC<RegistrationFormModalProps> = ({
                         </button>
 
                         {rulebookUrl && (
-                          <a
-                            href={rulebookUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            download
+                          <button
+                            type="button"
+                            onClick={() => handleDownloadRulebook(rulebookUrl)}
                             className="px-4 py-3 bg-black hover:bg-slate-900 text-cyan-300 border border-cyan-400/60 hover:border-cyan-300 font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-colors cursor-pointer shadow-md"
                           >
                             <FileText className="w-4 h-4 text-cyan-400" />
                             <span>DOWNLOAD RULEBOOK (PDF)</span>
-                          </a>
+                          </button>
                         )}
 
                         <button
