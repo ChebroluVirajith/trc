@@ -12,7 +12,7 @@ export const EVENTS_DATA: EventItem[] = [
     bannerImage: '/img/Events_Banners/ranveera_banner.jpg',
     iconBg: '/img/Event_Icons/ranaveera_icon_bg.jpeg',
     iconFg: '/img/Event_Icons/ranaveera_icon_fg.png',
-    pdfRulebook: '/rulebooks/ranaveera.pdf',
+    pdfRulebook: "/RV 25 Rule books/RANAVEERA RV'25 new.pdf",
     arenaVideo: '/img/ranvera_arena.mp4',
     prizePool: 'Cash Prizes & Trophies',
     coordinators: [
@@ -37,7 +37,7 @@ export const EVENTS_DATA: EventItem[] = [
     bannerImage: '/img/Events_Banners/pushpak_banner.jpg',
     iconBg: '/img/Event_Icons/drone_icon_bg.jpeg',
     iconFg: '/img/Event_Icons/drone_icon_fg.png',
-    pdfRulebook: '/rulebooks/pushpak.pdf',
+    pdfRulebook: '/RV 25 Rule books/PUSPHAK RV 25.pdf',
     prizePool: 'Cash Prizes & Certificates',
     coordinators: [
       { name: 'Pushpak Lead', role: 'Head', phone: '+91 6301932007' }
@@ -58,7 +58,7 @@ export const EVENTS_DATA: EventItem[] = [
     bannerImage: '/img/Events_Banners/sarvagami.jpg',
     iconBg: '/img/Event_Icons/sarvagami_icon_bg.jpg',
     iconFg: '/img/Event_Icons/sarvagami_icon_fg.png',
-    pdfRulebook: '/rulebooks/sarvaagami.pdf',
+    pdfRulebook: "/RV 25 Rule books/SARVAAGAMI RV'25.pdf",
     prizePool: 'Cash Prizes & Awards',
     coordinators: [
       { name: 'Sarvaagami Lead', role: 'Head', phone: '+91 6301932007' }
@@ -79,7 +79,7 @@ export const EVENTS_DATA: EventItem[] = [
     bannerImage: '/img/Events_Banners/yodha_banner.jpg',
     iconBg: '/img/Event_Icons/yodha_icon_bg.jpg',
     iconFg: '/img/Event_Icons/yodha_icon_fg.png',
-    pdfRulebook: '/rulebooks/yoddha.pdf',
+    pdfRulebook: "/RV 25 Rule books/YODDHA RV'25.pdf",
     prizePool: 'Cash Prizes & Trophies',
     coordinators: [
       { name: 'Yoddha Lead', role: 'Head', phone: '+91 6301932007' }
@@ -100,7 +100,7 @@ export const EVENTS_DATA: EventItem[] = [
     bannerImage: '/img/Events_Banners/lakshmanrekha_banner.jpg',
     iconBg: '/img/Event_Icons/lakshmanrekha_icon_bg.jpeg',
     iconFg: '/img/Event_Icons/lakshmanrekha_icon_fg.png',
-    pdfRulebook: '/rulebooks/lakshmanarekha.pdf',
+    pdfRulebook: "/RV 25 Rule books/LAKSHMANREKHA RV'25 new.pdf",
     prizePool: 'Cash Prizes & Mementos',
     coordinators: [
       { name: 'Lakshmanarekha Lead', role: 'Head', phone: '+91 6301932007' }
@@ -121,7 +121,7 @@ export const EVENTS_DATA: EventItem[] = [
     bannerImage: '/img/Events_Banners/gati_banner.jpg',
     iconBg: '/img/Event_Icons/gati_icon_bg.jpg',
     iconFg: '/img/Event_Icons/gati_icon_fg.png',
-    pdfRulebook: '/rulebooks/gati.pdf',
+    pdfRulebook: "/RV 25 Rule books/GATI RV'25.pdf",
     prizePool: 'Cash Prizes & Speed Trophy',
     coordinators: [
       { name: 'Sai Varun', role: 'Head', phone: '+91 6301932007', image: '/img/RV 25 board/Gati h1.jpg' }
@@ -142,7 +142,7 @@ export const EVENTS_DATA: EventItem[] = [
     bannerImage: '/img/Events_Banners/golaa_banner.jpg',
     iconBg: '/img/Event_Icons/gola_icon_bg.jpg',
     iconFg: '/img/Event_Icons/golaa_icon_fg.png',
-    pdfRulebook: '/rulebooks/goalaa.pdf',
+    pdfRulebook: "/RV 25 Rule books/GOALAA RV'25 new.pdf",
     prizePool: 'Cash Prizes & Football Trophy',
     coordinators: [
       { name: 'Goalaa Lead', role: 'Head', phone: '+91 6301932007' }
@@ -163,7 +163,7 @@ export const EVENTS_DATA: EventItem[] = [
     bannerImage: '/img/Events_Banners/yantraa_banner.jpeg',
     iconBg: '/img/Event_Icons/yantra_icon_bg.jpg',
     iconFg: '/img/Event_Icons/yantra_icon_fg.png',
-    pdfRulebook: '/rulebooks/yantraa.pdf',
+    pdfRulebook: "/RV 25 Rule books/YANTRAA RV'25.pdf",
     prizePool: 'Cash Prizes & Mementos',
     coordinators: [
       { name: 'Yantraa Lead', role: 'Head', phone: '+91 6301932007' }
@@ -184,7 +184,7 @@ export const EVENTS_DATA: EventItem[] = [
     bannerImage: '/img/Events_Banners/samanvayi.jpg',
     iconBg: '/img/Event_Icons/samanvayi_icon_bg.jpeg',
     iconFg: '/img/Event_Icons/samanvayi_icon_fg.png',
-    pdfRulebook: '/rulebooks/samanvayi.pdf',
+    pdfRulebook: "/RV 25 Rule books/SAMANVAYI RV'25new.pdf",
     prizePool: 'Cash Prizes & Certificates',
     coordinators: [
       { name: 'Samanvayi Lead', role: 'Head', phone: '+91 6301932007' }
@@ -205,7 +205,7 @@ export const EVENTS_DATA: EventItem[] = [
     bannerImage: '/img/Events_Banners/jalad_banner.jpg',
     iconBg: '/img/Event_Icons/jaladhmatra_icon_bg.jpg',
     iconFg: '/img/Event_Icons/jaladhmatra_icon_fg.png',
-    pdfRulebook: '/rulebooks/jaladhmatra.pdf',
+    pdfRulebook: "/RV 25 Rule books/JALADHMATRA RV'25.pdf",
     prizePool: 'Cash Prizes & Aquatic Trophy',
     coordinators: [
       { name: 'Jaladhmatra Lead', role: 'Head', phone: '+91 6301932007' }

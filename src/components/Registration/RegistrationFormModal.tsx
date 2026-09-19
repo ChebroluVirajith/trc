@@ -403,10 +403,10 @@ export const RegistrationFormModal: React.FC<RegistrationFormModalProps> = ({
     if (!url) return;
     try {
       const link = document.createElement('a');
-      link.href = url;
+      link.href = encodeURI(url);
       link.target = '_blank';
       link.rel = 'noopener noreferrer';
-      const cleanName = url.split('/').pop()?.split('?')[0] || 'ROBOVEDA26_RULEBOOK.pdf';
+      const cleanName = decodeURIComponent(url.split('/').pop()?.split('?')[0] || 'ROBOVEDA26_RULEBOOK.pdf');
       link.download = cleanName;
       document.body.appendChild(link);
       link.click();
@@ -416,7 +416,7 @@ export const RegistrationFormModal: React.FC<RegistrationFormModalProps> = ({
         }
       }, 200);
     } catch {
-      window.open(url, '_blank');
+      window.open(encodeURI(url), '_blank');
     }
   };
 
@@ -466,7 +466,7 @@ export const RegistrationFormModal: React.FC<RegistrationFormModalProps> = ({
                 const rulebookUrl =
                   paymentResult?.rulebook_url ||
                   getRulebookForEvent(eventName || currentTier.title) ||
-                  '/rulebooks/ranaveera.pdf';
+                  "/RV 25 Rule books/RANAVEERA RV'25 new.pdf";
                 return (
                   <>
                     <div className="text-center space-y-2">
